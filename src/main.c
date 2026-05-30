@@ -1,26 +1,8 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
-#include <X11/Xcursor/Xcursor.h>
-#include <stdlib.h>
+#include <X11/cursorfont.h>
 
-int RenderBackground(Display *display, Window window) {
-    int color = 0x0000FF;
-    XSetWindowBackground(display, window, color);
-    XClearWindow(display, window);
-    return 0; // Return 0 on success
-}
-
-int RenderCursor(Display *display, Window window) {
-    Cursor cursor = XcursorLibraryLoadCursor(display, "left_ptr");
-    if (cursor == None) {
-        fprintf(stderr, "Failed to load cursor\n");
-        return 1; // Return non-zero on failure
-    }
-    XDefineCursor(display, window, cursor);
-    return 0; // Return 0 on success
-}
-
-int main() {
+int main(void) {
     Display *display = XOpenDisplay(NULL);
     if (display == NULL) {
         fprintf(stderr, "Cannot open display\n");
@@ -28,13 +10,28 @@ int main() {
     }
 
     int screen = DefaultScreen(display);
-    Window window = XCreateSimpleWindow(display, RootWindow(display, screen), 10, 10, 800, 600, 1,
-                                        BlackPixel(display, screen), WhitePixel(display, screen));
-    XMapWindow(display, window);
-    XFlush(display);
+    Window window = XCreateSimpleWindow(
+        display,
+        RootWindow(display, screen),
+        10, 10,
+        800, 600,
+        0,
+        BlackPixel(display, screen),
+        0x0000FF);
 
-    RenderBackground(display, window);
-    RenderCursor(display, window);
+    XSelectInput(display, window, ExposureMask | KeyPressMask | StructureNotifyMask);
+    XStoreName(display, window, "TempleDesktop");
+    XDefineCursor(display, window, XCreateFontCursor(display, XC_left_ptr));
+    XMapWindow(display, window);
+
+    for (;;) {
+        XEvent event;
+        XNextEvent(display, &event);
+        if (event.type == KeyPress || event.type == DestroyNotify) {
+            break;
+        }
+    }
+
     XCloseDisplay(display);
     return 0;
 }
