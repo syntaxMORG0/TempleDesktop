@@ -10,11 +10,15 @@ int main(void) {
     }
 
     int screen = DefaultScreen(display);
+    int width = DisplayWidth(display, screen);
+    int height = DisplayHeight(display, screen);
+
     Window window = XCreateSimpleWindow(
         display,
         RootWindow(display, screen),
-        10, 10,
-        800, 600,
+        0, 0,
+        (unsigned int)width,
+        (unsigned int)height,
         0,
         BlackPixel(display, screen),
         0x0000FF);
