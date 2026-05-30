@@ -25,7 +25,7 @@ int main(void) {
 
     XSelectInput(display, window, ExposureMask | KeyPressMask | StructureNotifyMask);
     XStoreName(display, window, "TempleDesktop");
-    XDefineCursor(display, window, XCreateFontCursor(display, XC_left_ptr));
+    XDefineCursor(display, window, XCreateFontCursor(display, XC_top_left_arrow));
     XMapWindow(display, window);
 
     for (;;) {
